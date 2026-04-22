@@ -41,7 +41,7 @@ class MusicPlayer:
             return
         self.current_index = (self.current_index - 1) % len(self.playlist)
         self.load_track()
-        pygame.mixer.music.play()   # ← напрямую, минуя play()
+        pygame.mixer.music.play()   
         self.is_playing = True
 
     def get_current_track_name(self):
