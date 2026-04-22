@@ -5,7 +5,7 @@ returns table(
     name varchar,
     phone varchar
 )
-as $$
+as $$-
 begin
     return query
     select c.name, c.phone from contacts c where c.name ilike '%' || pattern ||'%'
