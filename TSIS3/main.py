@@ -105,7 +105,7 @@ def get_username():
                 elif event.key == pygame.K_BACKSPACE:
                     user_name = user_name[:-1]
                 else:
-                    if len(user_name) < 10: # Ограничим длину имени
+                    if len(user_name) < 10: 
                         user_name += event.unicode
         pygame.display.flip()
     return user_name
@@ -123,7 +123,7 @@ def save_score(name, score, distance):
         "score": score,
         "distance": int(distance)
     })
-    # Сортируем по очкам (от большего к меньшему) и оставляем ТОП-10
+
     data = sorted(data, key=lambda x: x['score'], reverse=True)[:10]
     with open(file_path, 'w') as f:
         json.dump(data, f, indent=4)
@@ -192,7 +192,7 @@ def show_settings():
         diffs = ["Easy", "Medium", "Hard"]
         idx = (diffs.index(settings['difficulty']) + 1) % 3
         settings['difficulty'] = diffs[idx]
-        pygame.time.delay(150) # Защита от дребезга клика
+        pygame.time.delay(150) 
     if draw_button("BACK & SAVE", 150, 500, 200, 50, (50, 50, 50), (80, 80, 80)):
         save_settings(settings)
         return 'menu'
@@ -210,33 +210,26 @@ def reset_game():
     car.rect.x = lines[lane_index]
     enemy.rect.y = -200
 while True:
-    # 1. Получаем события ОДИН РАЗ за итерацию
     events = pygame.event.get()
     for event in events:
         if event.type == pygame.QUIT:
             pygame.quit()
             exit()
 
-    # 2. ЭКРАН МЕНЮ
     if game_state == 'menu':
         game_state = show_menu()
-        if game_state == 'game': # Если нажали PLAY
+        if game_state == 'game': 
             reset_game()
 
-    # 3. ЭКРАН НАСТРОЕК
     elif game_state == 'settings':
         game_state = show_settings()
 
-    # 4. ЭКРАН ТАБЛИЦЫ ЛИДЕРОВ
     elif game_state == 'leaderboard':
         show_leaderboard()
         game_state = 'menu'
 
-    # 5. САМА ИГРА (Твой основной код теперь здесь)
     elif game_state == 'game':
         collision_happened = False
-        
-        # Управление машиной (перехватываем события из списка events)
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_LEFT:
@@ -247,8 +240,6 @@ while True:
                     if lane_index < len(lines) - 1:
                         lane_index += 1
                         car.rect.x = lines[lane_index]
-
-        # --- ТВОЯ ЛОГИКА ДВИЖЕНИЯ И ОТРИСОВКИ ---
         road1_y += road_speed
         road2_y += road_speed
         road3_y += road_speed  
@@ -261,7 +252,6 @@ while True:
         screen.blit(image_object3, (0, road3_y))
         car.draw(screen)
 
-        # Монеты
         for c in [coin1,coin2]:
             c.move(0,road_speed)
             if c.rect.y>=700:
@@ -271,7 +261,6 @@ while True:
                 c.rect.y = -80; c.rect.x = choice(lines2)
             c.draw(screen)
         
-        # Масло
         oil.move(0, road_speed)
         if oil.rect.y >= 700:
             oil.rect.y = randint(-900, -700); oil.rect.x = choice(lines2)
@@ -282,7 +271,6 @@ while True:
             oil.rect.y = -300; oil.rect.x = choice(lines2)
         oil.draw(screen)
 
-        # Препятствия и бонусы
         bump.move(0, road_speed)
         if bump.rect.y >= 700: bump.rect.y = -150; bump.rect.x = choice(lines2)
         if pygame.sprite.collide_rect(car, bump):
@@ -301,7 +289,6 @@ while True:
                 pu.rect.y = -1000
             pu.draw(screen)
 
-        # Обработка скоростей
         if active_powerup == 'nitro' and slow_timer == 0:
             road_speed = 6
         elif slow_timer > 0:
@@ -313,7 +300,6 @@ while True:
             powerup_timer -= 1
             if powerup_timer <= 0: active_powerup = None
 
-        # Враги
         enemy.move(enemy_speed + road_speed)
         if enemy.rect.y >= 700:
             enemy.rect.x = choice(lines3); enemy.rect.y = randint(-300, -100)
@@ -323,7 +309,6 @@ while True:
             else: collision_happened = True
         enemy.draw(screen)
 
-        # Текст на экране (HUD)
         dist_text = font_object.render(f"Distance: {int(distance_traveled)} / {finish_distance}m", True, (255, 255, 255))
         screen.blit(dist_text, (width - 250, 10))
         lives_text = font_object.render(f"Lives: {lives}", True, (0, 255, 0))
@@ -331,12 +316,11 @@ while True:
         score_text = font_object.render(f"Score {score}", True, (255, 255, 255))
         screen.blit(score_text, (10, 10))
 
-        # Логика смерти
         if collision_happened:
             final_score = score + int(distance_traveled)
             save_score(player_name, final_score, distance_traveled)
-            show_leaderboard() # Показываем топ после смерти
-            game_state = 'menu' # Возвращаемся в меню
+            show_leaderboard() 
+            game_state = 'menu' 
 
         enemy_speed = 4 + (score // 50)
         distance_traveled += road_speed * 0.1
